@@ -1,0 +1,26 @@
+services:
+  backend:
+    build: ./backend
+    container_name: pagecraft-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - page-data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build: ./frontend
+    container_name: pagecraft-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  page-data:

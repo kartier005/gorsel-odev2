@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="GrapesJS tabanlı web sayfa tasarım editörü">
+    <title>PageCraft - Web Sayfa Editörü</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- GrapesJS Core -->
+    <link rel="stylesheet" href="https://unpkg.com/grapesjs@0.21.13/dist/css/grapes.min.css">
+    <!-- GrapesJS Preset Webpage Plugin CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/grapesjs-preset-webpage@1.0.3/dist/grapesjs-preset-webpage.min.css">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ============================================ -->
+    <!-- PAGE MANAGER PANEL (shown when no page open) -->
+    <!-- ============================================ -->
+    <div class="page-manager" id="page-manager">
+        <div class="pm-container">
+            <!-- Header -->
+            <header class="pm-header">
+                <div class="pm-logo">
+                    <span class="pm-logo-icon">🎨</span>
+                    <div>
+                        <h1>PageCraft</h1>
+                        <p>GrapesJS Web Sayfa Editörü</p>
+                    </div>
+                </div>
+                <button class="btn-create" id="btn-create-page">
+                    <span>+</span> Yeni Sayfa
+                </button>
+            </header>
+
+            <!-- Page Grid -->
+            <div class="pm-content">
+                <div class="pm-grid" id="page-grid">
+                    <!-- Pages will be rendered here -->
+                </div>
+
+                <div class="pm-empty" id="pm-empty" style="display: none;">
+                    <div class="pm-empty-icon">📄</div>
+                    <h3>Henüz sayfa yok</h3>
+                    <p>Yeni bir sayfa oluşturarak web tasarımına başlayın!</p>
+                    <button class="btn-create" onclick="showCreateModal()">
+                        <span>+</span> İlk Sayfanı Oluştur
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- EDITOR VIEW (shown when editing a page)      -->
+    <!-- ============================================ -->
+    <div class="editor-view" id="editor-view" style="display: none;">
+        <!-- Top Bar -->
+        <div class="editor-topbar" id="editor-topbar">
+            <div class="topbar-left">
+                <button class="topbar-btn back-btn" id="btn-back" title="Sayfalara Dön">
+                    ← Geri
+                </button>
+                <div class="topbar-divider"></div>
+                <span class="topbar-page-name" id="topbar-page-name">Sayfa Adı</span>
+            </div>
+            <div class="topbar-center">
+                <div class="device-buttons">
+                    <button class="device-btn active" data-device="Desktop" title="Masaüstü">🖥️</button>
+                    <button class="device-btn" data-device="Tablet" title="Tablet">📱</button>
+                    <button class="device-btn" data-device="Mobile portrait" title="Mobil">📲</button>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-btn" id="btn-preview" title="Önizleme">👁️ Önizle</button>
+                <button class="topbar-btn" id="btn-code" title="Kodu Gör">{ } Kod</button>
+                <button class="topbar-btn save-btn" id="btn-save" title="Kaydet">💾 Kaydet</button>
+            </div>
+        </div>
+
+        <!-- GrapesJS Editor Container -->
+        <div id="gjs"></div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- CREATE PAGE MODAL                            -->
+    <!-- ============================================ -->
+    <div class="modal-overlay" id="modal-create">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🆕 Yeni Sayfa Oluştur</h3>
+                <button class="modal-close" onclick="closeCreateModal()">✕</button>
+            </div>
+            <form id="form-create-page">
+                <div class="form-group">
+                    <label for="input-page-name">Sayfa Adı</label>
+                    <input type="text" id="input-page-name" placeholder="Örn: Ana Sayfa, Hakkımızda..." required>
+                </div>
+                <div class="form-group">
+                    <label>Başlangıç Şablonu</label>
+                    <div class="template-grid">
+                        <label class="template-card selected" data-template="blank">
+                            <input type="radio" name="template" value="blank" checked>
+                            <div class="template-icon">📄</div>
+                            <span>Boş Sayfa</span>
+                        </label>
+                        <label class="template-card" data-template="landing">
+                            <input type="radio" name="template" value="landing">
+                            <div class="template-icon">🚀</div>
+                            <span>Landing Page</span>
+                        </label>
+                        <label class="template-card" data-template="portfolio">
+                            <input type="radio" name="template" value="portfolio">
+                            <div class="template-icon">💼</div>
+                            <span>Portfolyo</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeCreateModal()">İptal</button>
+                    <button type="submit" class="btn-submit">Oluştur</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- CODE VIEW MODAL                              -->
+    <!-- ============================================ -->
+    <div class="modal-overlay" id="modal-code">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h3>{ } Kaynak Kodu</h3>
+                <button class="modal-close" onclick="closeCodeModal()">✕</button>
+            </div>
+            <div class="code-tabs">
+                <button class="code-tab active" data-tab="html">HTML</button>
+                <button class="code-tab" data-tab="css">CSS</button>
+            </div>
+            <div class="code-content">
+                <pre id="code-html" class="code-block"></pre>
+                <pre id="code-css" class="code-block" style="display:none;"></pre>
+            </div>
+            <div class="form-actions" style="padding: 16px 28px 24px;">
+                <button class="btn-submit" onclick="closeCodeModal()">Kapat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- GrapesJS Scripts -->
+    <script src="https://unpkg.com/grapesjs@0.21.13/dist/grapes.min.js"></script>
+    <script src="https://unpkg.com/grapesjs-preset-webpage@1.0.3/dist/grapesjs-preset-webpage.min.js"></script>
+    <script src="https://unpkg.com/grapesjs-blocks-basic@1.0.2/dist/index.js"></script>
+
+    <script src="app.js"></script>
+</body>
+</html>
